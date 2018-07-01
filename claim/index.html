@@ -24,15 +24,17 @@
     text-align: center;
     transform: translate3d(0, -50%, 0vw);
     animation: 1s in;
+    animation-delay: 0.5s;
+    animation-fill-mode: both;
   }
 
   @keyframes in {
     from {
-      transform: translate3d(0, -50%, -1000vw);
+      transform: translate3d(0, -50%, -1000vw) rotateX(240deg) rotateY(-240deg) rotate(720deg);
       opacity: 0;
     }
     to {
-      transform: translate3d(0, -50%, 0vw);
+      transform: translate3d(0, -50%, 0vw) rotateX(0deg) rotateY(0deg) rotate(0deg);
       opacity: 1;
     }
   }
@@ -55,7 +57,7 @@
       document.querySelector('#code').textContent = codeMatch[1]
       setTimeout(function () {
         location.replace('https://www.eventpop.me/e/3789-the-stupid-hackathon-thailand-2-will-take-place-on-july-14th-to-15th-2018-at-link-collaboration-space-banthat-thong-rd-rong-muang-pathum-wan-bangkok?discount_code=' + codeMatch[1])
-      }, 1000)
+      }, 1500)
     } catch (e) {
       document.querySelector('#claim').textContent = String(e)
     }
