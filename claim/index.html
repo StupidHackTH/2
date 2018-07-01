@@ -1,0 +1,62 @@
+<title>The Stupid Hackathon Thailand #2</title>
+<style>
+  body {
+    font: 16px sans-serif;
+    background: black;
+    color: white;
+  }
+
+  #main {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    perspective: 100vw;
+  }
+
+  #claim {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    font-size: 10vw;
+    text-align: center;
+    transform: translate3d(0, -50%, 0vw);
+    animation: 1s in;
+  }
+
+  @keyframes in {
+    from {
+      transform: translate3d(0, -50%, -1000vw);
+      opacity: 0;
+    }
+    to {
+      transform: translate3d(0, -50%, 0vw);
+      opacity: 1;
+    }
+  }
+</style>
+
+<body>
+  <div id="main">
+    <div id="claim">Claiming ticket
+      <br />
+      <strong id="code">...</strong>
+    </div>
+  </div>
+
+  <script>
+    try {
+      var codeMatch = location.search.match(/(\w{6,})/)
+      if (!codeMatch) {
+        throw new Error('Cannot find code from location.search')
+      }
+      document.querySelector('#code').textContent = codeMatch[1]
+      setTimeout(function () {
+        location.replace('https://www.eventpop.me/e/3789-the-stupid-hackathon-thailand-2-will-take-place-on-july-14th-to-15th-2018-at-link-collaboration-space-banthat-thong-rd-rong-muang-pathum-wan-bangkok?discount_code=' + codeMatch[1])
+      }, 1000)
+    } catch (e) {
+      document.querySelector('#claim').textContent = String(e)
+    }
+  </script>
