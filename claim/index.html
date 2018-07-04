@@ -1,9 +1,38 @@
 <title>The Stupid Hackathon Thailand #2</title>
+<link href="https://fonts.googleapis.com/css?family=Questrial" rel="stylesheet">
 <style>
   body {
-    font: 16px sans-serif;
+    font: 16px Questrial, sans-serif;
     background: black;
     color: white;
+  }
+
+  body.tada::after {
+    content: '';
+    display: block;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    pointer-events: none;
+    background: white;
+    opacity: 0;
+    animation: 3s flash;
+  }
+
+  body.tada {
+    background: #F74DE4;
+    background-image: linear-gradient(-180deg, #FFAB46 0%, #F74DE4 100%);
+  }
+
+  @keyframes flash {
+    0% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0;
+    }
   }
 
   #main {
@@ -15,17 +44,50 @@
     perspective: 100vw;
   }
 
-  #claim {
+  .center {
     position: absolute;
     top: 50%;
     left: 0;
     right: 0;
-    font-size: 10vw;
-    text-align: center;
+    font-size: 12vw;
     transform: translate3d(0, -50%, 0vw);
+    text-align: center;
+  }
+
+  #msg {
     animation: 1s in;
-    animation-delay: 0.5s;
     animation-fill-mode: both;
+  }
+
+  .hide {
+    display: none;
+  }
+
+  #button {
+    margin: 0;
+    padding: 0.25em 0.5em;
+    background: #333;
+    color: #fff;
+    font: inherit;
+    text-decoration: none;
+    border-radius: 1000px;
+    background-image: linear-gradient(-180deg, #f27eff 0%, #9141ff 100%);
+    border: 1px solid #a449ff;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.3),
+    inset 0 0 5px 0 rgba(255, 255, 255, 0.5);
+    color: white;
+    text-shadow: 0 1px 5px #000;
+  }
+
+  #button:hover {
+    color: black;
+    background-image: linear-gradient( -180deg,
+    #cfff7e 0%,
+    #58d52e 48%,
+    #68dc49 53%,
+    #3cde1b 100%);
+    border-color: #16b900;
+    text-shadow: 0 0 3px #ffa;
   }
 
   @keyframes in {
@@ -38,13 +100,50 @@
       opacity: 1;
     }
   }
+
+  #lyrics span {
+    transform: translateY(100vh) translateZ(0);
+    display: inline-block;
+    text-shadow: 0 0.1ex 0.3ex rgba(0, 0, 0, 0.5);
+  }
+
+  #lyrics span.shown {
+    transform: translateY(0) translateZ(0);
+    animation: 1s wow linear;
+  }
+
+  @keyframes wow {
+    0% {
+      transform: translateY(100vh) translateZ(0);
+      animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    67% {
+      transform: translateY(-1ex) translateZ(0);
+      animation-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    }
+    100% {
+      transform: translateY(0) translateZ(0);
+    }
+  }
 </style>
 
 <body>
   <div id="main">
-    <div id="claim">Claiming ticket
-      <br />
-      <strong id="code">...</strong>
+    <div id="msg" class="center">Loading...</div>
+    <div id="invitation" class="hide">
+      <audio src="invited.mp3" preload="auto" id="song"></audio>
+      <div class="center" id="lyrics">
+        <span data-b="3.75">You’re</span>
+        <span data-b="4.5">invited</span>
+        <span data-b="6">to</span>
+        <span data-b="6.75">The</span>
+        <span data-b="7.5">Stupid</span>
+        <span data-b="9">Hackathon</span>
+        <span data-b="10.75">Thailand</span>
+      </div>
+      <div class="center" id="button-container">
+        <button id="button">Click here...</button>
+      </div>
     </div>
   </div>
 
@@ -54,11 +153,36 @@
       if (!codeMatch) {
         throw new Error('Cannot find code from location.search')
       }
-      document.querySelector('#code').textContent = codeMatch[1]
-      setTimeout(function () {
-        location.replace('https://www.eventpop.me/e/3789-the-stupid-hackathon-thailand-2-will-take-place-on-july-14th-to-15th-2018-at-link-collaboration-space-banthat-thong-rd-rong-muang-pathum-wan-bangkok?discount_code=' + codeMatch[1])
-      }, 1500)
+      document.querySelector('#msg').textContent = ''
+      document.querySelector('#invitation').classList.remove('hide')
+      document.querySelector('#button').onclick = function () {
+        document.querySelector('#button-container').classList.add('hide')
+        var song = document.querySelector('#song')
+        var pieces = document.querySelector('#lyrics').querySelectorAll('span')
+        song.play()
+        var iv = setInterval(function () {
+          var beat = song.currentTime * 111 / 60
+          for (var i = 0; i < pieces.length; i++) {
+            var piece = pieces[i]
+            if (beat + 0.25 <= +piece.dataset.b) {
+              if (piece.classList.contains('shown')) piece.classList.remove('shown')
+            } else {
+              if (!piece.classList.contains('shown')) piece.classList.add('shown')
+            }
+          }
+          var body = document.body
+          if (beat <= 11.75) {
+            if (body.classList.contains('tada')) body.classList.remove('tada')
+          } else {
+            if (!body.classList.contains('tada')) body.classList.add('tada')
+          }
+          if (song.currentTime > 9) {
+            clearInterval(iv)
+            location.replace('https://www.eventpop.me/e/3789-the-stupid-hackathon-thailand-2-will-take-place-on-july-14th-to-15th-2018-at-link-collaboration-space-banthat-thong-rd-rong-muang-pathum-wan-bangkok?discount_code=' + codeMatch[1])
+          }
+        }, 30)
+      }
     } catch (e) {
-      document.querySelector('#claim').textContent = String(e)
+      document.querySelector('#msg').textContent = String(e)
     }
   </script>
