@@ -125,13 +125,59 @@
       transform: translateY(0) translateZ(0);
     }
   }
+
+  #boink.flown {
+    animation: fly 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    animation-fill-mode: both;
+  }
+
+  #boink span {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-radius: 1em;
+    background: #888;
+    margin: 0.2em;
+    opacity: 0;
+  }
+
+  #boink span.shown {
+    opacity: 1;
+    animation: piew 0.1s;
+  }
+
+  @keyframes piew {
+    0% {
+      transform: translateY(-0.1em) translateZ(0) scale(1.2);
+    }
+    100% {
+      transform: translateY(0) translateZ(0) scale(1);
+    }
+  }
+
+  @keyframes fly {
+    0% {
+      transform: translateY(-50%) translateY(0) translateZ(0);
+    }
+    100% {
+      transform: translateY(-50%) translateY(-100vh) translateZ(0);
+    }
+  }
 </style>
 
 <body>
   <div id="main">
     <div id="msg" class="center">Loading...</div>
     <div id="invitation" class="hide">
-      <audio src="invited.mp3" preload="auto" id="song"></audio>
+      <audio src="invited192.mp3" preload="auto" id="song"></audio>
+      <div class="center" id="loading">
+        (Loading)
+      </div>
+      <div class="center" id="boink">
+        <span data-b="0.01"></span>
+        <span data-b="1"></span>
+        <span data-b="2"></span>
+      </div>
       <div class="center" id="lyrics">
         <span data-b="3.75">You’re</span>
         <span data-b="4.5">invited</span>
@@ -158,24 +204,24 @@
       document.querySelector('#button').onclick = function () {
         document.querySelector('#button-container').classList.add('hide')
         var song = document.querySelector('#song')
+        var loading = document.querySelector('#loading')
         var pieces = document.querySelector('#lyrics').querySelectorAll('span')
+        var boink = document.querySelector('#boink')
+        var boinks = boink.querySelectorAll('span')
         song.play()
         var iv = setInterval(function () {
           var beat = song.currentTime * 111 / 60
+          reconcile(loading, 'hide', beat >= 0.01)
+          for (var i = 0; i < boinks.length; i++) {
+            var piece = boinks[i]
+            reconcile(piece, 'shown', beat >= +piece.dataset.b)
+          }
+          reconcile(boink, 'flown', beat >= 2.25)
           for (var i = 0; i < pieces.length; i++) {
             var piece = pieces[i]
-            if (beat + 0.25 <= +piece.dataset.b) {
-              if (piece.classList.contains('shown')) piece.classList.remove('shown')
-            } else {
-              if (!piece.classList.contains('shown')) piece.classList.add('shown')
-            }
+            reconcile(piece, 'shown', beat + 0.25 >= +piece.dataset.b)
           }
-          var body = document.body
-          if (beat <= 11.75) {
-            if (body.classList.contains('tada')) body.classList.remove('tada')
-          } else {
-            if (!body.classList.contains('tada')) body.classList.add('tada')
-          }
+          reconcile(document.body, 'tada', beat >= 11.75)
           if (song.currentTime > 9) {
             clearInterval(iv)
             location.replace('https://www.eventpop.me/e/3789-the-stupid-hackathon-thailand-2-will-take-place-on-july-14th-to-15th-2018-at-link-collaboration-space-banthat-thong-rd-rong-muang-pathum-wan-bangkok?discount_code=' + codeMatch[1])
@@ -184,5 +230,13 @@
       }
     } catch (e) {
       document.querySelector('#msg').textContent = String(e)
+    }
+
+    function reconcile(element, className, value) {
+      if (value) {
+        if (!element.classList.contains(className)) element.classList.add(className)
+      } else {
+        if (element.classList.contains(className)) element.classList.remove(className)
+      }
     }
   </script>
